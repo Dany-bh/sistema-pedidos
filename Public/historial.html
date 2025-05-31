@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Historial de Pedidos - El Maná</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #34495e;
+      margin-bottom: 20px;
+    }
+    .pedido {
+      background: #ecf0f1;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .estado-pendiente {
+      color: orange;
+      font-weight: bold;
+    }
+    .estado-listo {
+      color: green;
+      font-weight: bold;
+    }
+    ul {
+      margin: 10px 0 0 20px;
+    }
+    .botones {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px;
+      background: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .descargar {
+      background: #2980b9;
+    }
+    .limpiar {
+      background: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <h1>Historial de Pedidos</h1>
+
+  <div class="botones">
+
+    <button class="limpiar" onclick="limpiarHistorial()">Limpiar Historial</button>
+  </div>
+
+  <div id="historial"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const historialDiv = document.getElementById('historial');
+
+    socket.on('historialActualizado', historial => {
+      historialDiv.innerHTML = '';
+      if (historial.length === 0) {
+        historialDiv.innerHTML = '<p>No hay historial aún.</p>';
+        return;
+      }
+      historial.forEach(p => {
+        const html = `
+          <div class="pedido">
+            <b>Mesero:</b> ${p.mesero}<br>
+            <b>Mesa:</b> ${p.mesa}<br>
+            <b>Inicio:</b> ${p.horaInicio}<br>
+            ${p.duracion ? `<b>Duración:</b> ${p.duracion}<br>` : ''}
+            <b>Estado:</b> <span class="estado-${p.estado}">${p.estado.toUpperCase()}</span>
+            <ul>${p.items.map(i => `<li>${i.nombre} ${i.listo ? '✔️' : ''}</li>`).join('')}</ul>
+          </div>`;
+        historialDiv.innerHTML += html;
+      });
+    });
+
+    function limpiarHistorial() {
+      if (confirm('¿Seguro que deseas borrar todo el historial?')) {
+        socket.emit('limpiarHistorial');
+      }
+    }
+
+  </script>
+</body>
+</html>

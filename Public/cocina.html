@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cocina - El Maná</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f3f5;
+    }
+    h1 {
+      text-align: center;
+      color: #c0392b;
+      margin: 20px 0;
+    }
+    .container {
+      display: flex;
+      gap: 20px;
+      padding: 0 20px;
+    }
+    .column {
+      flex: 1;
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      height: calc(100vh - 120px);
+      overflow-y: auto;
+    }
+    .pedido {
+      background: #ecf0f1;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 6px;
+    }
+    .estado-pendiente { color: orange; font-weight: bold; }
+    .estado-listo { color: green; font-weight: bold; }
+    .checkboxes label {
+      display: block;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cocina - El Maná</h1>
+  <div class="container">
+    <div class="column">
+      <h2>Pedidos Pendientes</h2>
+      <div id="pendientes"></div>
+    </div>
+    <div class="column">
+      <h2>Pedidos Listos</h2>
+      <div id="listos"></div>
+    </div>
+  </div>
+
+  <audio id="sonidoNuevo" src="nuevo_pedido.mp3"></audio>
+  <audio id="sonidoListo" src="pedido_listo.mp3"></audio>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const pendientesDiv = document.getElementById('pendientes');
+    const listosDiv = document.getElementById('listos');
+    const sonidoNuevo = document.getElementById('sonidoNuevo');
+    const sonidoListo = document.getElementById('sonidoListo');
+
+    document.addEventListener('click', () => {
+      sonidoNuevo.play().catch(() => {});
+      sonidoListo.play().catch(() => {});
+    }, { once: true });
+
+    socket.on('pedidosActuales', pedidos => {
+      pendientesDiv.innerHTML = '';
+      listosDiv.innerHTML = '';
+      pedidos.forEach(p => {
+        const html = `
+          <div class="pedido">
+            <b>Mesero:</b> ${p.mesero}<br>
+            <b>Mesa:</b> ${p.mesa}<br>
+            <b>Inicio:</b> ${p.horaInicio}<br>
+            ${p.duracion ? `<b>Duración:</b> ${p.duracion}<br>` : ''}
+            <b>Estado:</b> <span class="estado-${p.estado}">${p.estado.toUpperCase()}</span>
+            <div class="checkboxes">
+              ${p.items.map((i, idx) => `<label><input type="checkbox" data-pedido="${p.id}" data-index="${idx}" ${i.listo ? 'checked disabled' : ''}> ${i.nombre} ${i.listo ? '✔️' : ''}</label>`).join('')}
+            </div>
+          </div>`;
+        if (p.estado === 'pendiente') {
+          pendientesDiv.innerHTML += html;
+        } else {
+          listosDiv.innerHTML += html;
+        }
+      });
+
+      document.querySelectorAll('input[type="checkbox"]:not(:disabled)').forEach(c => {
+        c.onclick = () => {
+          const pedidoId = parseInt(c.dataset.pedido);
+          const itemIndex = parseInt(c.dataset.index);
+          if (!isNaN(pedidoId) && !isNaN(itemIndex)) {
+            socket.emit('marcarPlatoListo', { pedidoId, itemIndex });
+            c.closest('label').style.backgroundColor = '#d4edda';
+          }
+        };
+      });
+    });
+
+    socket.on('nuevoPedidoSonido', () => sonidoNuevo.play());
+    socket.on('pedidoListoSonido', () => sonidoListo.play());
+  </script>
+</body>
+</html>

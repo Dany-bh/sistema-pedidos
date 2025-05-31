@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - El Maná</title>
+  <style>
+    body {
+      background: #ecf0f1;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      width: 300px;
+    }
+    input, select, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #16a085;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .extra {
+      background: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Iniciar Sesión</h2>
+    <select id="rol">
+      <option value="mesero">Mesero</option>
+      <option value="cocina">Cocina</option>
+    </select>
+    <input type="text" id="usuario" placeholder="Nombre" />
+    <button onclick="login()">Entrar</button>
+    <button class="extra" onclick="verHistorial()">Ver Historial</button>
+  </div>
+
+  <script>
+    function login() {
+      const rol = document.getElementById('rol').value;
+      const usuario = document.getElementById('usuario').value.trim();
+      if (!usuario) return alert('Ingrese su nombre');
+      localStorage.setItem('usuario', usuario);
+      if (rol === 'mesero') window.location.href = 'mesero.html';
+      else window.location.href = 'cocina.html';
+    }
+
+    function verHistorial() {
+      window.location.href = 'historial.html';
+    }
+  </script>
+</body>
+</html>
