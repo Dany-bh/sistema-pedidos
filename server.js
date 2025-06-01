@@ -10,6 +10,9 @@ const port = process.env.PORT || 3000;
 
 app.use(express.static('public'));
 
+const path = require('path');
+
+
 let pedidos = [];
 let historialPedidos = []; // Aquí guardamos el historial completo de pedidos entregados
 let siguienteId = 1;
