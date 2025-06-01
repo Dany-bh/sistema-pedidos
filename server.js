@@ -73,9 +73,7 @@ io.on('connection', socket => {
     console.log('Cliente desconectado:', socket.id);
   });
 });
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
-});
+
 
 server.listen(port, '0.0.0.0', () => {
   console.log(`🍽️ El Maná corriendo en http://localhost:${port}`);
@@ -85,9 +83,11 @@ app.get('/historial', (req, res) => {
   // Ordena por tiempoInicio descendente: pedidos más recientes primero
   const historialOrdenado = [...historialPedidos].sort((a, b) => b.tiempoInicio - a.tiempoInicio);
   res.json(historialOrdenado);
-});
+})
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+})
 
-app.get('/ping', (req, res) => {
-  res.send('pong');
-});
-
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+})
