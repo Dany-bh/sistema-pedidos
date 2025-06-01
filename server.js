@@ -70,6 +70,9 @@ io.on('connection', socket => {
     console.log('Cliente desconectado:', socket.id);
   });
 });
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
 
 server.listen(port, '0.0.0.0', () => {
   console.log(`🍽️ El Maná corriendo en http://localhost:${port}`);
