@@ -87,4 +87,7 @@ app.get('/historial', (req, res) => {
   res.json(historialOrdenado);
 });
 
+app.get('/ping', (req, res) => {
+  res.send('pong');
+});
 
