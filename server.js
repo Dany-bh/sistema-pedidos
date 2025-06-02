@@ -26,7 +26,16 @@ io.on('connection', socket => {
     pedido.id = siguienteId++;
     pedido.estado = 'pendiente';
     pedido.tiempoInicio = Date.now();
-    pedido.horaInicio = new Date().toLocaleString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: true, day: '2-digit', month: '2-digit', year: 'numeric' }).replace(',', '');
+    pedido.horaInicio = new Date().toLocaleString('es-PE', {
+      timeZone: 'America/Lima',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).replace(',', '');
+    
     pedido.items = pedido.items.map(item => ({ nombre: item, listo: false }));
     pedidos.unshift(pedido); // Agrega el nuevo pedido al inicio (orden más reciente)
     io.emit('pedidosActuales', pedidos);
